@@ -3,6 +3,11 @@ import { STYLES } from './styles'
 const loaded = new Set<string>()
 const failed = new Set<string>()
 
+/** China-friendly CSS hosts first; Google last. */
+const FONT_CSS_HOSTS = ['fonts.loli.net', 'fonts.font.im', 'fonts.googleapis.com'] as const
+
+const FONTS_LOAD_TIMEOUT_MS = 4000
+
 function buildCssUrl(family: string, weights?: string, host = 'fonts.googleapis.com'): string {
   const fam = encodeURIComponent(family)
   const wght = weights ? `:wght@${weights}` : ''
@@ -26,35 +31,63 @@ function injectLink(href: string): Promise<void> {
   })
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new Error('timeout')), ms)
+    promise.then(
+      (v) => {
+        window.clearTimeout(timer)
+        resolve(v)
+      },
+      (e) => {
+        window.clearTimeout(timer)
+        reject(e)
+      },
+    )
+  })
+}
+
+async function waitForFaces(family: string, weights?: string): Promise<void> {
+  const face = weights ? `700 48px "${family}"` : `400 48px "${family}"`
+  try {
+    await withTimeout(document.fonts.load(face), FONTS_LOAD_TIMEOUT_MS)
+    if (weights) {
+      for (const w of weights.split(';')) {
+        await withTimeout(document.fonts.load(`${w} 48px "${family}"`), FONTS_LOAD_TIMEOUT_MS).catch(
+          () => undefined,
+        )
+      }
+    }
+  } catch {
+    // Stylesheet loaded but fonts.load timed out / failed — best-effort; do not fail the family
+  }
+}
+
 async function loadFamily(family: string, weights?: string): Promise<void> {
   const key = `${family}|${weights ?? ''}`
   if (loaded.has(key)) return
   if (failed.has(key)) throw new Error(`Font previously failed: ${family}`)
 
-  const primary = buildCssUrl(family, weights, 'fonts.googleapis.com')
-  const fallback = buildCssUrl(family, weights, 'fonts.loli.net')
+  let stylesheetOk = false
+  let lastError: unknown
 
-  try {
-    await injectLink(primary)
-  } catch {
-    await injectLink(fallback)
-  }
-
-  // Wait for FontFace to actually be usable
-  const face = weights
-    ? `700 48px "${family}"`
-    : `400 48px "${family}"`
-  try {
-    await document.fonts.load(face)
-    // Also try other common weights
-    if (weights) {
-      for (const w of weights.split(';')) {
-        await document.fonts.load(`${w} 48px "${family}"`).catch(() => undefined)
-      }
+  for (const host of FONT_CSS_HOSTS) {
+    const href = buildCssUrl(family, weights, host)
+    try {
+      await injectLink(href)
+      stylesheetOk = true
+      break
+    } catch (e) {
+      lastError = e
     }
-  } catch {
-    // fonts.load may fail on some browsers; CSS load is enough
   }
+
+  if (!stylesheetOk) {
+    throw lastError instanceof Error ? lastError : new Error(`All font hosts failed for ${family}`)
+  }
+
+  // Wait for FontFace; timeout still counts as best-effort success
+  await waitForFaces(family, weights)
 
   loaded.add(key)
 }

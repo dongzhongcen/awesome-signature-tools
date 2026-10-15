@@ -8,9 +8,10 @@
 
 *多风格字体 · 宣纸/印章背景 · 签名头像 · 一键多款 · PNG 下载*
 
-[English](./README.en.md) · [在线体验](https://dongzhongcen.github.io/awesome-signature-tools/)
+[English](./README.en.md) · [国内访问](https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html) · [国际 / GitHub Pages](https://dongzhongcen.github.io/awesome-signature-tools/)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![国内 CDN](https://img.shields.io/badge/China-jsDelivr-orange)](https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://dongzhongcen.github.io/awesome-signature-tools/)
 [![Vite](https://img.shields.io/badge/Vite-5+-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -29,6 +30,16 @@
 ## 隐私
 
 姓名与签名图**仅在浏览器本地**通过 Canvas 渲染与导出，**不会上传到任何服务器**。本项目无后端、无 API、无统计、无广告。
+
+## 国内访问
+
+GitHub Pages 在中国大陆网络下经常无法打开。本仓库另发布**相对路径**构建到 `cdn` 分支，可通过 jsDelivr 访问：
+
+- **国内主入口（jsDelivr）**：https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
+- 镜像（任选）：https://fastly.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html · https://gcore.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
+- **国际 / GitHub Pages**：https://dongzhongcen.github.io/awesome-signature-tools/
+
+字体样式表会优先从国内友好镜像（`fonts.loli.net` → `fonts.font.im`）加载，最后才回退到 `fonts.googleapis.com`。姓名与签名图仍只在浏览器本地渲染，不会上传。
 
 ## 简介
 
@@ -83,7 +94,7 @@
 
 ## 字体与许可
 
-本仓库**不打包**字体二进制文件。运行时由浏览器从 Google Fonts（及 `fonts.loli.net` 回退）加载以下 OFL 字体：
+本仓库**不打包**字体二进制文件。运行时由浏览器按顺序从 `fonts.loli.net` → `fonts.font.im` → `fonts.googleapis.com` 加载以下 OFL 字体：
 
 Ma Shan Zheng · Zhi Mang Xing · Liu Jian Mao Cao · Long Cang · ZCOOL XiaoWei · ZCOOL QingKe HuangYou · Noto Serif SC · Noto Sans SC
 
@@ -99,17 +110,22 @@ npm run dev
 构建：
 
 ```bash
-npm run build
+npm run build          # GitHub Pages（base: /awesome-signature-tools/）
+npm run build:cdn      # 便携 CDN（base: ./ ，供 jsDelivr）
 npm run preview
 ```
 
-生产站点路径为 `/awesome-signature-tools/`（见 `vite.config.ts` 中 `base`）。
+默认 `base` 为 `/awesome-signature-tools/`；设置 `VITE_BASE=./`（或运行 `build:cdn`）可生成相对路径资源，便于 jsDelivr 等 CDN 托管。
 
 ## 部署
 
-推送到 `main` 分支后，`.github/workflows/deploy.yml` 会自动构建并发布到 GitHub Pages。
+推送到 `main` 分支后，`.github/workflows/deploy.yml` 会：
 
-仓库主页：https://dongzhongcen.github.io/awesome-signature-tools/
+1. 构建并发布到 **GitHub Pages**
+2. 以相对路径再构建一次，强制更新 **`cdn` 分支**（供 jsDelivr）
+
+- 国内：https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
+- 国际：https://dongzhongcen.github.io/awesome-signature-tools/
 
 ## 许可
 

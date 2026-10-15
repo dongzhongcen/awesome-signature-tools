@@ -8,9 +8,10 @@
 
 *Multi-style fonts · Paper / seal backgrounds · Avatar crop · Batch styles · PNG download*
 
-[简体中文](./README.md) · [Live Demo](https://dongzhongcen.github.io/awesome-signature-tools/)
+[简体中文](./README.md) · [Mainland China](https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html) · [International / GitHub Pages](https://dongzhongcen.github.io/awesome-signature-tools/)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![China CDN](https://img.shields.io/badge/China-jsDelivr-orange)](https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://dongzhongcen.github.io/awesome-signature-tools/)
 [![Vite](https://img.shields.io/badge/Vite-5+-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -29,6 +30,16 @@ Images produced by this tool are **decorative artistic signatures only**. They a
 ## Privacy
 
 Your name and signature image are rendered **locally in the browser** via Canvas and are **never uploaded to any server**. There is no backend, no API, no analytics, and no ads.
+
+## Mainland China access
+
+GitHub Pages is often unreachable from mainland China. This repo also publishes a **relative-path** build to the `cdn` branch for jsDelivr:
+
+- **Primary China URL (jsDelivr)**: https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
+- Mirrors: https://fastly.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html · https://gcore.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
+- **International / GitHub Pages**: https://dongzhongcen.github.io/awesome-signature-tools/
+
+Font stylesheets try China-friendly mirrors first (`fonts.loli.net` → `fonts.font.im`), then `fonts.googleapis.com`. Your name and signature stay local in the browser and are never uploaded.
 
 ## Overview
 
@@ -83,7 +94,7 @@ Transparent · White · Xuan paper texture · Light gray paper · Red seal circl
 
 ## Fonts & licenses
 
-This repo does **not** ship font binaries. The browser loads these OFL families from Google Fonts (with a `fonts.loli.net` fallback) at runtime:
+This repo does **not** ship font binaries. The browser loads these OFL families in order from `fonts.loli.net` → `fonts.font.im` → `fonts.googleapis.com`:
 
 Ma Shan Zheng · Zhi Mang Xing · Liu Jian Mao Cao · Long Cang · ZCOOL XiaoWei · ZCOOL QingKe HuangYou · Noto Serif SC · Noto Sans SC
 
@@ -99,17 +110,22 @@ npm run dev
 Build:
 
 ```bash
-npm run build
+npm run build          # GitHub Pages (base: /awesome-signature-tools/)
+npm run build:cdn      # Portable CDN (base: ./ for jsDelivr)
 npm run preview
 ```
 
-Production base path is `/awesome-signature-tools/` (see `base` in `vite.config.ts`).
+Default `base` is `/awesome-signature-tools/`; set `VITE_BASE=./` (or run `build:cdn`) for relative asset paths suitable for jsDelivr.
 
 ## Deploy
 
-Pushing to `main` runs `.github/workflows/deploy.yml` and publishes to GitHub Pages.
+Pushing to `main` runs `.github/workflows/deploy.yml`, which:
 
-Live site: https://dongzhongcen.github.io/awesome-signature-tools/
+1. Builds and deploys to **GitHub Pages**
+2. Rebuilds with relative paths and force-updates the **`cdn` branch** (for jsDelivr)
+
+- China: https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
+- International: https://dongzhongcen.github.io/awesome-signature-tools/
 
 ## License
 
