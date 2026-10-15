@@ -6,8 +6,10 @@ They are loaded at runtime via the FontFace API from the same origin
 (relative to the Vite `base` path). No Google Fonts / fonts.loli.net /
 fonts.font.im (or other third-party) stylesheet is fetched in the browser.
 
-Binaries are **SIL Open Font License (OFL) 1.1** chinese-simplified subsets
-packaged by Fontsource from the official Google Fonts OFL sources.
+Binaries are **SIL Open Font License (OFL) 1.1**, further subset to a
+Chinese **personal-name** character set (~2.2k CJK + Latin/punct/UI) via
+`pyftsubset` (`npm run fonts:subset`). Rare name characters outside the
+subset may show a tip in the UI.
 
 Families, files, and upstream
 -----------------------------
@@ -19,15 +21,17 @@ Families, files, and upstream
 | Long Cang              | LongCang-Regular.woff2                             | https://github.com/google/fonts/tree/main/ofl/longcang |
 | ZCOOL XiaoWei          | ZCOOLXiaoWei-Regular.woff2                         | https://github.com/google/fonts/tree/main/ofl/zcoolxiaowei |
 | ZCOOL QingKe HuangYou  | ZCOOLQingKeHuangYou-Regular.woff2                  | https://github.com/google/fonts/tree/main/ofl/zcoolqingkehuangyou |
-| Noto Sans SC           | NotoSansSC-{400,500,700,900}.woff2                 | https://github.com/google/fonts/tree/main/ofl/notosanssc |
+| Noto Sans SC           | NotoSansSC-{400,500,900}.woff2                     | https://github.com/google/fonts/tree/main/ofl/notosanssc |
 | Noto Serif SC          | NotoSerifSC-{700,900}.woff2                        | https://github.com/google/fonts/tree/main/ofl/notoserifsc |
 
 Versions / packaging
 --------------------
-- Subset flavor: Fontsource `chinese-simplified` woff2 (covers common
-  Simplified Chinese glyphs used for names/UI; rare characters may fall back).
-- Refresh binaries: `node scripts/fetch-fonts.mjs`
+- Source flavor: Fontsource `chinese-simplified` woff2, then name-subset.
+- Refresh binaries: `npm run fonts:fetch` (fetch + subset) or `npm run fonts:subset`
+- Charset: `scripts/name-charset.txt`
 - Per-family OFL text copies: `fonts/licenses/OFL-*.txt`
+- Runtime: default style (Ma Shan Zheng) + UI (Noto Sans SC 400) load first;
+  other families load on demand when a style chip or「一键生成多款」is used.
 
 Additional visual styles (立体字 / 刀锋体 / 创意签 / 描边签 /
 印章红 / 霓虹签 / 网红签 etc.) are produced by Canvas drawing

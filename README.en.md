@@ -41,6 +41,10 @@ GitHub Pages is often unreachable from mainland China. This repo also publishes 
 
 **Fonts are self-hosted** under `public/fonts/` (OFL woff2) and loaded same-origin — **no** Google Fonts or third-party font CDN. Your name and signature stay local in the browser and are never uploaded.
 
+- **Lazy-load**: first paint loads only the default brush face + UI Noto Sans SC; other styles load on chip select or batch generate.
+- **Name subset**: display fonts are subset to ~2.2k common name CJK + Latin/punct.
+- **Offline**: download the Release zip `offline-签名生成.zip`, unzip, and double-click `index.html` (`file://`). See `OFFLINE.txt` inside.
+
 ## Overview
 
 **Online Free E-Signature Generator** (repo: `awesome-signature-tools`) runs entirely in the browser. Enter a name, pick a style and background, preview, then download a PNG — **with zero watermark on the bitmap**.

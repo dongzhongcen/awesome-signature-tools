@@ -1,12 +1,13 @@
 import { STYLES } from './styles'
+import type { StyleDef } from './types'
 
 const loaded = new Set<string>()
 const failed = new Set<string>()
+const inflight = new Map<string, Promise<void>>()
 
 /**
- * Self-hosted OFL woff2 under public/fonts/.
- * Paths are resolved with Vite BASE_URL so both
- * GitHub Pages (/awesome-signature-tools/) and relative CDN (./) work.
+ * Self-hosted OFL woff2 under public/fonts/ (Chinese personal-name subsets).
+ * Paths use Vite BASE_URL so GitHub Pages and relative CDN / file:// work.
  */
 type FontFile = {
   family: string
@@ -23,7 +24,6 @@ const FONT_FILES: FontFile[] = [
   { family: 'ZCOOL QingKe HuangYou', weight: 400, file: 'ZCOOLQingKeHuangYou-Regular.woff2' },
   { family: 'Noto Sans SC', weight: 400, file: 'NotoSansSC-400.woff2' },
   { family: 'Noto Sans SC', weight: 500, file: 'NotoSansSC-500.woff2' },
-  { family: 'Noto Sans SC', weight: 700, file: 'NotoSansSC-700.woff2' },
   { family: 'Noto Sans SC', weight: 900, file: 'NotoSansSC-900.woff2' },
   { family: 'Noto Serif SC', weight: 700, file: 'NotoSerifSC-700.woff2' },
   { family: 'Noto Serif SC', weight: 900, file: 'NotoSerifSC-900.woff2' },
@@ -31,9 +31,13 @@ const FONT_FILES: FontFile[] = [
 
 const FONTS_LOAD_TIMEOUT_MS = 8000
 
+/** Default display style + UI sans — only these load at startup. */
+export const DEFAULT_DISPLAY_FAMILY = 'Ma Shan Zheng'
+export const UI_FAMILY = 'Noto Sans SC'
+export const UI_WEIGHTS = '400'
+
 function fontUrl(file: string): string {
   const base = import.meta.env.BASE_URL || '/'
-  // Ensure single slash join for both "./" and "/awesome-signature-tools/"
   const prefix = base.endsWith('/') ? base : `${base}/`
   return `${prefix}fonts/${file}`
 }
@@ -59,6 +63,9 @@ async function loadFontFile(entry: FontFile): Promise<void> {
   if (loaded.has(key)) return
   if (failed.has(key)) throw new Error(`Font previously failed: ${entry.family} ${entry.weight}`)
 
+  const existing = inflight.get(key)
+  if (existing) return existing
+
   const url = fontUrl(entry.file)
   const face = new FontFace(entry.family, `url(${JSON.stringify(url)}) format("woff2")`, {
     weight: String(entry.weight),
@@ -66,72 +73,93 @@ async function loadFontFile(entry: FontFile): Promise<void> {
     display: 'swap',
   })
 
-  try {
-    await withTimeout(face.load(), FONTS_LOAD_TIMEOUT_MS)
-    document.fonts.add(face)
-    loaded.add(key)
-  } catch (e) {
-    failed.add(key)
-    throw e instanceof Error ? e : new Error(String(e))
-  }
+  const p = (async () => {
+    try {
+      await withTimeout(face.load(), FONTS_LOAD_TIMEOUT_MS)
+      document.fonts.add(face)
+      loaded.add(key)
+    } catch (e) {
+      failed.add(key)
+      throw e instanceof Error ? e : new Error(String(e))
+    } finally {
+      inflight.delete(key)
+    }
+  })()
+  inflight.set(key, p)
+  return p
 }
 
 function filesNeededForFamily(family: string, weights?: string): FontFile[] {
   const wanted = weights
-    ? new Set(weights.split(';').map((w) => Number(w)))
+    ? new Set(weights.split(';').map((w) => Number(w.trim())).filter((n) => !Number.isNaN(n)))
     : null
 
-  const matches = FONT_FILES.filter((f) => {
-    if (f.family !== family) return false
-    if (!wanted) return f.weight === 400 || FONT_FILES.filter((x) => x.family === family).length === 1
-    return wanted.has(f.weight)
-  })
+  const familyFiles = FONT_FILES.filter((f) => f.family === family)
+  if (familyFiles.length === 0) return []
 
-  // Display families: single Regular covers all
-  if (matches.length === 0) {
-    return FONT_FILES.filter((f) => f.family === family)
+  if (!wanted || wanted.size === 0) {
+    // Single-file display families, or default to 400
+    if (familyFiles.length === 1) return familyFiles
+    return familyFiles.filter((f) => f.weight === 400)
   }
-  return matches
+
+  const matches = familyFiles.filter((f) => wanted.has(f.weight))
+  return matches.length > 0 ? matches : familyFiles
 }
 
-async function loadFamily(family: string, weights?: string): Promise<void> {
+export async function loadFamily(family: string, weights?: string): Promise<void> {
   const files = filesNeededForFamily(family, weights)
   if (files.length === 0) {
     throw new Error(`No local font files for ${family}`)
   }
-  // Load all weight files for this family; one failure fails the family
   await Promise.all(files.map((f) => loadFontFile(f)))
 }
 
-export async function loadAllFonts(
+/** Startup: Ma Shan Zheng + Noto Sans SC 400 only. */
+export async function loadInitialFonts(): Promise<{ ok: string[]; failed: string[] }> {
+  const ok: string[] = []
+  const bad: string[] = []
+  for (const [family, weights] of [
+    [UI_FAMILY, UI_WEIGHTS],
+    [DEFAULT_DISPLAY_FAMILY, '400'],
+  ] as const) {
+    try {
+      await loadFamily(family, weights)
+      ok.push(family)
+    } catch {
+      bad.push(family)
+    }
+  }
+  return { ok, failed: bad }
+}
+
+/** Load fonts required by one style definition. */
+export async function loadStyleFonts(style: StyleDef): Promise<void> {
+  await loadFamily(style.googleFamily, style.weights ?? '400')
+}
+
+/** Load fonts for a list of style ids (e.g. multi-generate). */
+export async function loadStylesFonts(
+  styleIds: string[],
   onProgress?: (done: number, total: number) => void,
 ): Promise<{ ok: string[]; failed: string[] }> {
   const unique = new Map<string, string | undefined>()
-  for (const s of STYLES) {
-    if (!unique.has(s.googleFamily)) {
-      unique.set(s.googleFamily, s.weights)
-    } else if (s.weights) {
-      const prev = unique.get(s.googleFamily)
-      if (prev && !prev.includes(s.weights)) {
-        unique.set(s.googleFamily, `${prev};${s.weights}`)
-      } else if (!prev) {
-        unique.set(s.googleFamily, s.weights)
-      }
+  for (const id of styleIds) {
+    const s = STYLES.find((x) => x.id === id)
+    if (!s) continue
+    const prev = unique.get(s.googleFamily)
+    const w = s.weights ?? '400'
+    if (!prev) unique.set(s.googleFamily, w)
+    else {
+      const merged = Array.from(new Set([...prev.split(';'), ...w.split(';')])).join(';')
+      unique.set(s.googleFamily, merged)
     }
   }
-
-  // Always load Noto Sans SC for UI (400/500/700)
-  const uiPrev = unique.get('Noto Sans SC')
-  unique.set(
-    'Noto Sans SC',
-    uiPrev ? Array.from(new Set([...uiPrev.split(';'), '400', '500', '700'])).join(';') : '400;500;700',
-  )
 
   const entries = [...unique.entries()]
   const ok: string[] = []
   const bad: string[] = []
   let done = 0
-
   await Promise.all(
     entries.map(async ([family, weights]) => {
       try {
@@ -145,10 +173,64 @@ export async function loadAllFonts(
       }
     }),
   )
-
   return { ok, failed: bad }
 }
 
-export function isFontReady(family: string): boolean {
+export function isFontReady(family: string, weight?: number): boolean {
+  if (weight != null) return loaded.has(`${family}|${weight}`)
   return [...loaded].some((k) => k.startsWith(`${family}|`))
+}
+
+export function isStyleFontReady(style: StyleDef): boolean {
+  const weights = (style.weights ?? '400').split(';').map((w) => Number(w.trim()))
+  return weights.every((w) => isFontReady(style.googleFamily, w) || isFontReady(style.googleFamily))
+}
+
+/**
+ * Detect CJK chars missing from the loaded subset via canvas .notdef comparison.
+ */
+export function findMissingGlyphs(
+  family: string,
+  text: string,
+  weight = '400',
+): string[] {
+  if (!text || typeof document === 'undefined') return []
+  const canvas = document.createElement('canvas')
+  const size = 48
+  canvas.width = size * 2
+  canvas.height = size * 2
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })
+  if (!ctx) return []
+
+  const render = (ch: string): Uint8ClampedArray => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.fillStyle = '#000'
+    ctx.textBaseline = 'middle'
+    ctx.textAlign = 'center'
+    ctx.font = `${weight} ${size}px "${family}"`
+    ctx.fillText(ch, size, size)
+    return ctx.getImageData(0, 0, canvas.width, canvas.height).data
+  }
+
+  // Private-use / unlikely codepoint → .notdef reference for this face
+  const ref = render('\uE000')
+  const missing: string[] = []
+  const seen = new Set<string>()
+
+  for (const ch of text) {
+    if (seen.has(ch)) continue
+    seen.add(ch)
+    // Only tip for CJK unified ideographs
+    if (ch < '\u4e00' || ch > '\u9fff') continue
+    const data = render(ch)
+    let same = true
+    for (let i = 0; i < ref.length; i++) {
+      if (ref[i] !== data[i]) {
+        same = false
+        break
+      }
+    }
+    if (same) missing.push(ch)
+  }
+  return missing
 }

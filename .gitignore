@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 .font-fetch-tmp
+.font-subset-tmp
+scripts/subset-report.json

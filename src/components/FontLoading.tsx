@@ -3,9 +3,10 @@ interface Props {
   progress: number
   total: number
   failed: string[]
+  label?: string
 }
 
-export function FontLoading({ loading, progress, total, failed }: Props) {
+export function FontLoading({ loading, progress, total, failed, label }: Props) {
   if (!loading && failed.length === 0) return null
   const pct = total ? Math.round((progress / total) * 100) : 0
   return (
@@ -13,7 +14,7 @@ export function FontLoading({ loading, progress, total, failed }: Props) {
       {loading ? (
         <div>
           <div className="flex justify-between text-sm mb-1.5">
-            <span className="text-gray-600">正在加载字体…</span>
+            <span className="text-gray-600">{label ?? '正在加载字体…'}</span>
             <span className="text-gray-400 tabular-nums">{pct}%</span>
           </div>
           <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * Download OFL chinese-simplified woff2 subsets into public/fonts/.
- * Sources: @fontsource/* packages (SIL OFL, derived from Google Fonts).
- * Upstream family trees: https://github.com/google/fonts/tree/main/ofl/...
+ * Download OFL chinese-simplified woff2 into public/fonts/, then subset.
+ * Sources: @fontsource/* (SIL OFL, from Google Fonts OFL trees).
  *
  * Usage: node scripts/fetch-fonts.mjs
+ * After fetch, runs subset-fonts.mjs (name-charset personal-name subset).
  */
 import { execSync } from 'node:child_process'
 import { copyFileSync, mkdirSync, rmSync, existsSync, readdirSync } from 'node:fs'
@@ -49,21 +49,24 @@ for (const [pkg, outName, srcName] of display) {
   }
 }
 
-console.log('fetch noto-sans-sc')
+console.log('fetch noto-sans-sc (400/500/900)')
 {
   const pkgDir = packExtract('@fontsource/noto-sans-sc')
-  for (const w of [400, 500, 700, 900]) {
+  for (const w of [400, 500, 900]) {
     copyFileSync(
       join(pkgDir, 'files', `noto-sans-sc-chinese-simplified-${w}-normal.woff2`),
       join(dest, `NotoSansSC-${w}.woff2`),
     )
   }
+  // Remove unused weight if left from older fetches
+  const unused = join(dest, 'NotoSansSC-700.woff2')
+  if (existsSync(unused)) rmSync(unused)
   copyFileSync(join(pkgDir, 'LICENSE'), join(licenseDir, 'OFL-noto-sans-sc.txt'))
   rmSync(join(tmp, 'package'), { recursive: true, force: true })
   for (const f of readdirSync(tmp)) if (f.endsWith('.tgz')) rmSync(join(tmp, f))
 }
 
-console.log('fetch noto-serif-sc')
+console.log('fetch noto-serif-sc (700/900)')
 {
   const pkgDir = packExtract('@fontsource/noto-serif-sc')
   for (const w of [700, 900]) {
@@ -78,4 +81,6 @@ console.log('fetch noto-serif-sc')
 }
 
 rmSync(tmp, { recursive: true, force: true })
-console.log('Done →', dest)
+console.log('Fetched →', dest)
+console.log('Running fonts:subset …')
+execSync('node scripts/subset-fonts.mjs', { cwd: root, stdio: 'inherit' })

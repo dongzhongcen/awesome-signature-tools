@@ -5,9 +5,11 @@ import type { DrawOptions } from '../lib/types'
 interface Props {
   options: DrawOptions | null
   fontsReady: boolean
+  styleLoading?: boolean
+  missingGlyphTip?: boolean
 }
 
-export function Preview({ options, fontsReady }: Props) {
+export function Preview({ options, fontsReady, styleLoading, missingGlyphTip }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export function Preview({ options, fontsReady }: Props) {
           options?.sigType === 'avatar' ? 'rounded-full max-w-[280px] mx-auto aspect-square' : ''
         }`}
       >
-        {!fontsReady ? (
+        {styleLoading || !fontsReady ? (
           <p className="text-gray-400 text-sm animate-pulse">字体加载中…</p>
         ) : !options?.name.trim() ? (
           <p className="text-gray-400 text-sm">输入姓名后显示预览</p>
@@ -44,6 +46,11 @@ export function Preview({ options, fontsReady }: Props) {
           <canvas ref={canvasRef} className="max-w-full h-auto" />
         )}
       </div>
+      {missingGlyphTip ? (
+        <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-1.5">
+          当前字体子集未包含该字
+        </p>
+      ) : null}
     </div>
   )
 }

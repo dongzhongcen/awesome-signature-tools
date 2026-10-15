@@ -5,6 +5,7 @@ interface Props {
   onMulti: () => void
   copyMsg: string
   multiActive: boolean
+  multiLoading?: boolean
 }
 
 export function DownloadBar({
@@ -14,6 +15,7 @@ export function DownloadBar({
   onMulti,
   copyMsg,
   multiActive,
+  multiLoading,
 }: Props) {
   return (
     <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
@@ -26,10 +28,10 @@ export function DownloadBar({
       <button
         type="button"
         className={`btn-secondary ${multiActive ? '!bg-red-50 !border-red-200 !text-red-800' : ''}`}
-        disabled={disabled}
+        disabled={multiLoading || (!multiActive && disabled)}
         onClick={onMulti}
       >
-        一键生成多款
+        {multiLoading ? '加载字体中…' : '一键生成多款'}
       </button>
       {copyMsg && <span className="text-sm text-green-700">{copyMsg}</span>}
     </div>

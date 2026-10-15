@@ -10,8 +10,14 @@ import { NameInput, validateName } from './components/NameInput'
 import { Preview } from './components/Preview'
 import { StyleChips } from './components/StyleChips'
 import { TypeToggle } from './components/TypeToggle'
-import { loadAllFonts } from './lib/fonts'
-import { getStyle } from './lib/styles'
+import {
+  findMissingGlyphs,
+  isStyleFontReady,
+  loadInitialFonts,
+  loadStyleFonts,
+  loadStylesFonts,
+} from './lib/fonts'
+import { getStyle, MULTI_STYLES } from './lib/styles'
 import type { BgType, DrawOptions, SigType, StyleId } from './lib/types'
 
 export default function App() {
@@ -27,26 +33,29 @@ export default function App() {
   const [padding, setPadding] = useState(32)
   const [multiActive, setMultiActive] = useState(false)
   const [copyMsg, setCopyMsg] = useState('')
-  const [fontsReady, setFontsReady] = useState(false)
+  const [initialReady, setInitialReady] = useState(false)
   const [fontLoading, setFontLoading] = useState(true)
   const [fontProgress, setFontProgress] = useState(0)
   const [fontTotal, setFontTotal] = useState(1)
   const [fontFailed, setFontFailed] = useState<string[]>([])
+  const [styleLoading, setStyleLoading] = useState(false)
+  const [loadingStyleId, setLoadingStyleId] = useState<StyleId | null>(null)
+  const [multiLoading, setMultiLoading] = useState(false)
+  const [missingTip, setMissingTip] = useState(false)
   const exportRef = useRef<HTMLCanvasElement>(null)
 
+  // Initial: only Ma Shan Zheng + Noto Sans SC 400
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       setFontLoading(true)
-      const result = await loadAllFonts((done, total) => {
-        if (!cancelled) {
-          setFontProgress(done)
-          setFontTotal(total)
-        }
-      })
+      setFontProgress(0)
+      setFontTotal(2)
+      const result = await loadInitialFonts()
       if (!cancelled) {
         setFontFailed(result.failed)
-        setFontsReady(true)
+        setFontProgress(2)
+        setInitialReady(true)
         setFontLoading(false)
       }
     })()
@@ -57,15 +66,71 @@ export default function App() {
 
   const style = useMemo(() => getStyle(styleId), [styleId])
 
-  // Apply style default color when style changes (girl / neon / seal)
+  // Load font when style chip changes
+  useEffect(() => {
+    if (!initialReady) return
+    if (isStyleFontReady(style)) {
+      setStyleLoading(false)
+      setLoadingStyleId(null)
+      return
+    }
+    let cancelled = false
+    setStyleLoading(true)
+    setLoadingStyleId(styleId)
+    ;(async () => {
+      try {
+        await loadStyleFonts(style)
+      } catch {
+        if (!cancelled) {
+          setFontFailed((prev) =>
+            prev.includes(style.googleFamily) ? prev : [...prev, style.googleFamily],
+          )
+        }
+      } finally {
+        if (!cancelled) {
+          setStyleLoading(false)
+          setLoadingStyleId(null)
+        }
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [styleId, style, initialReady])
+
+  // Apply style default color when style changes
   useEffect(() => {
     if (style.defaultColor) {
       setColor(style.defaultColor)
     }
   }, [styleId]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Missing glyph tip for current name + style
+  useEffect(() => {
+    if (!initialReady || styleLoading || !isStyleFontReady(style)) {
+      setMissingTip(false)
+      return
+    }
+    const trimmed = name.trim()
+    if (!trimmed) {
+      setMissingTip(false)
+      return
+    }
+    const weight =
+      style.weights?.includes('900')
+        ? '900'
+        : style.weights?.includes('700')
+          ? '700'
+          : style.weights?.includes('500')
+            ? '500'
+            : '400'
+    const missing = findMissingGlyphs(style.googleFamily, trimmed, weight)
+    setMissingTip(missing.length > 0)
+  }, [name, style, styleId, initialReady, styleLoading])
+
   const nameError = validateName(name)
-  const canGenerate = !nameError && fontsReady
+  const styleReady = initialReady && isStyleFontReady(style) && !styleLoading
+  const canGenerate = !nameError && styleReady
 
   const options: DrawOptions | null = useMemo(() => {
     if (!name.trim()) return null
@@ -113,21 +178,50 @@ export default function App() {
     }
   }
 
+  const handleMulti = async () => {
+    if (multiActive) {
+      setMultiActive(false)
+      return
+    }
+    setMultiLoading(true)
+    setFontLoading(true)
+    setFontProgress(0)
+    try {
+      await loadStylesFonts(MULTI_STYLES, (done, total) => {
+        setFontProgress(done)
+        setFontTotal(total)
+      })
+      setMultiActive(true)
+    } finally {
+      setMultiLoading(false)
+      setFontLoading(false)
+    }
+  }
+
+  const handleStyleChange = (id: StyleId) => {
+    setStyleId(id)
+  }
+
   return (
     <div className="min-h-screen pb-16">
       <Header />
 
       <main className="max-w-3xl mx-auto px-4 space-y-4">
         <FontLoading
-          loading={fontLoading}
+          loading={fontLoading || multiLoading}
           progress={fontProgress}
           total={fontTotal}
           failed={fontFailed}
+          label={multiLoading ? '正在加载多款字体…' : undefined}
         />
 
         <section className="card space-y-5">
           <NameInput value={name} onChange={setName} error={nameError ?? undefined} />
-          <StyleChips value={styleId} onChange={setStyleId} />
+          <StyleChips
+            value={styleId}
+            onChange={handleStyleChange}
+            loadingId={loadingStyleId}
+          />
           <BackgroundPicker value={bg} onChange={setBg} />
           <TypeToggle
             value={sigType}
@@ -150,14 +244,20 @@ export default function App() {
         </section>
 
         <section className="card space-y-4">
-          <Preview options={canGenerate ? options : null} fontsReady={fontsReady} />
+          <Preview
+            options={canGenerate ? options : null}
+            fontsReady={styleReady}
+            styleLoading={styleLoading}
+            missingGlyphTip={missingTip}
+          />
           <DownloadBar
             disabled={!canGenerate}
             onDownload={handleDownload}
             onCopy={handleCopy}
-            onMulti={() => setMultiActive((v) => !v)}
+            onMulti={handleMulti}
             copyMsg={copyMsg}
             multiActive={multiActive}
+            multiLoading={multiLoading}
           />
         </section>
 
@@ -171,8 +271,8 @@ export default function App() {
           slant={slant}
           padding={padding}
           ring={ring}
-          fontsReady={fontsReady}
-          active={multiActive && canGenerate}
+          fontsReady={multiActive && !multiLoading}
+          active={multiActive && !nameError}
           onPick={(id) => {
             setStyleId(id)
             window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -210,7 +310,6 @@ export default function App() {
         </footer>
       </main>
 
-      {/* Hidden export canvas */}
       <canvas ref={exportRef} className="hidden" aria-hidden />
     </div>
   )

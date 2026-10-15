@@ -41,6 +41,13 @@ GitHub Pages 在中国大陆网络下经常无法打开。本仓库另发布**�
 
 **字体已自托管**于仓库 `public/fonts/`（OFL woff2），随站点同源加载，**不依赖** Google Fonts 或第三方字体 CDN。姓名与签名图仍只在浏览器本地渲染，不会上传。
 
+- **按需加载**：首次仅加载默认「毛笔签」+ 界面字体（Noto Sans SC）；切换风格芯片或「一键生成多款」时再拉取对应字体。
+- **常用字子集**：展示字体已用姓名常用字（约 2.2k 汉字 + 拉丁/标点）子集，显著减小体积；极生僻字会提示「当前字体子集未包含该字」。
+
+### 离线打开（草案）
+
+若 jsDelivr 连接失败，可从 Releases 下载 `offline-签名生成.zip`，解压后**双击 `index.html`**（`file://`）即可离线使用；字体在 `./fonts/`。备选：`python3 -m http.server` 后本地访问。详见包内 `OFFLINE.txt`。
+
 ## 简介
 
 「在线免费生成电子签名」是一个**完全在浏览器中运行**的电子签名图片生成工具。输入姓名，选择风格与背景，即可预览并下载透明或带背景的 PNG，**生成图片不含任何水印**。
@@ -94,11 +101,11 @@ GitHub Pages 在中国大陆网络下经常无法打开。本仓库另发布**�
 
 ## 字体与许可
 
-本仓库在 `public/fonts/` **自托管**以下 OFL 字体的简体子集 woff2（同源 FontFace 加载，无外部字体请求）：
+本仓库在 `public/fonts/` **自托管**以下 OFL 字体的**姓名常用字**子集 woff2（同源 FontFace 按需加载，无外部字体请求）：
 
 Ma Shan Zheng · Zhi Mang Xing · Liu Jian Mao Cao · Long Cang · ZCOOL XiaoWei · ZCOOL QingKe HuangYou · Noto Serif SC · Noto Sans SC
 
-完整说明见 [fonts/NOTICE](./fonts/NOTICE)。代码部分为 [MIT](./LICENSE)。
+刷新字体：`npm run fonts:fetch`（下载并子集）或 `npm run fonts:subset`。完整说明见 [fonts/NOTICE](./fonts/NOTICE)。代码部分为 [MIT](./LICENSE)。
 
 ## 本地开发
 
