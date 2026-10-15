@@ -68,7 +68,7 @@ GitHub Pages 在中国大陆网络下经常无法打开。本仓库另发布**�
 | 印章红 | 朱红印章风格 |
 | 霓虹签 | 发光霓虹效果 |
 
-字体均来自 Google Fonts 上的 **SIL Open Font License (OFL)** 开源字体；立体 / 描边 / 霓虹等为 Canvas 绘制效果。详见 [fonts/NOTICE](./fonts/NOTICE)。
+字体为源自 Google Fonts 目录的 **SIL Open Font License (OFL)** 开源字体，已自托管于仓库（woff2）；立体 / 描边 / 霓虹等为 Canvas 绘制效果。详见 [fonts/NOTICE](./fonts/NOTICE)。
 
 ### 背景效果
 

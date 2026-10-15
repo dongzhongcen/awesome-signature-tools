@@ -68,7 +68,7 @@ GitHub Pages is often unreachable from mainland China. This repo also publishes 
 | Seal red (印章红) | Vermilion seal look |
 | Neon (霓虹签) | Glow neon effect |
 
-Fonts are **SIL Open Font License (OFL)** families from Google Fonts; emboss / outline / neon / etc. are Canvas effects. See [fonts/NOTICE](./fonts/NOTICE).
+Fonts are **SIL Open Font License (OFL)** faces that originated from the Google Fonts catalog and are self-hosted as woff2 in this repo; emboss / outline / neon / etc. are Canvas effects. See [fonts/NOTICE](./fonts/NOTICE).
 
 ### Backgrounds
 
