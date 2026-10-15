@@ -47,11 +47,14 @@ GitHub Pages is often unreachable from mainland China. This repo also publishes 
 
 When the CDN or GitHub Pages is blocked, use the offline zip (no Node required):
 
-1. Open the [v1.1.0-fonts Release](https://github.com/dongzhongcen/awesome-signature-tools/releases/tag/v1.1.0-fonts) and download `offline-signature-generator.zip`
+1. Download `offline-signature-generator.zip` (pick one):
+   - [China proxy (recommended)](https://ghfast.top/https://github.com/dongzhongcen/awesome-signature-tools/releases/download/v1.1.0-fonts/offline-signature-generator.zip)
+   - [Backup proxy](https://ghproxy.net/https://github.com/dongzhongcen/awesome-signature-tools/releases/download/v1.1.0-fonts/offline-signature-generator.zip)
+   - [GitHub direct](https://github.com/dongzhongcen/awesome-signature-tools/releases/download/v1.1.0-fonts/offline-signature-generator.zip)
 2. Unzip it anywhere
 3. **Double-click `index.html`** to open it in a browser
 
-Fonts live under `./fonts/` and load locally. If the browser blocks local scripts, run `python3 -m http.server` in the unzipped folder and open the local URL it prints. See `OFFLINE.txt` in the zip for details.
+Fonts live under `./fonts/` and load locally. If you get a blank page, the browser likely blocked local scripts: in the unzipped folder run `python -m http.server 8080`, then open `http://127.0.0.1:8080/`. See `OFFLINE.txt` in the zip. Use third-party GitHub mirrors only to download the zip — do not sign in on them.
 
 ## Overview
 

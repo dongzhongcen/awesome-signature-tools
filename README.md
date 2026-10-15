@@ -48,11 +48,14 @@ GitHub Pages 在中国大陆网络下经常无法打开。本仓库另发布**�
 
 CDN / GitHub Pages 打不开时，用离线包最稳（不需要会 Node）：
 
-1. 打开 [v1.1.0-fonts Release](https://github.com/dongzhongcen/awesome-signature-tools/releases/tag/v1.1.0-fonts)，下载 `offline-signature-generator.zip`
+1. 下载离线包 `offline-signature-generator.zip`（任选其一）：
+   - [国内代理下载（推荐）](https://ghfast.top/https://github.com/dongzhongcen/awesome-signature-tools/releases/download/v1.1.0-fonts/offline-signature-generator.zip)
+   - [备用代理](https://ghproxy.net/https://github.com/dongzhongcen/awesome-signature-tools/releases/download/v1.1.0-fonts/offline-signature-generator.zip)
+   - [GitHub 直链](https://github.com/dongzhongcen/awesome-signature-tools/releases/download/v1.1.0-fonts/offline-signature-generator.zip)（直连不稳时用上面代理）
 2. 解压到任意文件夹
 3. **双击 `index.html`** 用浏览器打开即可
 
-字体在 `./fonts/`，随包本地加载。若浏览器拦截了本地脚本，可在解压目录执行 `python3 -m http.server`，再用浏览器打开提示的本地地址。更细说明见包内 `OFFLINE.txt`。
+字体在 `./fonts/`，随包本地加载。若双击后白屏，多半是浏览器拦了本地脚本：在解压目录打开终端，运行 `python -m http.server 8080`，再用浏览器打开 `http://127.0.0.1:8080/`。更细说明见包内 `OFFLINE.txt`。第三方加速站只用来下 zip，不要在上面登录账号。
 
 ## 简介
 
