@@ -3,32 +3,39 @@ import { STYLES } from './styles'
 const loaded = new Set<string>()
 const failed = new Set<string>()
 
-/** China-friendly CSS hosts first; Google last. */
-const FONT_CSS_HOSTS = ['fonts.loli.net', 'fonts.font.im', 'fonts.googleapis.com'] as const
-
-const FONTS_LOAD_TIMEOUT_MS = 4000
-
-function buildCssUrl(family: string, weights?: string, host = 'fonts.googleapis.com'): string {
-  const fam = encodeURIComponent(family)
-  const wght = weights ? `:wght@${weights}` : ''
-  return `https://${host}/css2?family=${fam}${wght}&display=swap`
+/**
+ * Self-hosted OFL woff2 under public/fonts/.
+ * Paths are resolved with Vite BASE_URL so both
+ * GitHub Pages (/awesome-signature-tools/) and relative CDN (./) work.
+ */
+type FontFile = {
+  family: string
+  weight: number
+  file: string
 }
 
-function injectLink(href: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const existing = document.querySelector(`link[data-gf="${href}"]`)
-    if (existing) {
-      resolve()
-      return
-    }
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = href
-    link.dataset.gf = href
-    link.onload = () => resolve()
-    link.onerror = () => reject(new Error(`Failed to load ${href}`))
-    document.head.appendChild(link)
-  })
+const FONT_FILES: FontFile[] = [
+  { family: 'Ma Shan Zheng', weight: 400, file: 'MaShanZheng-Regular.woff2' },
+  { family: 'Zhi Mang Xing', weight: 400, file: 'ZhiMangXing-Regular.woff2' },
+  { family: 'Liu Jian Mao Cao', weight: 400, file: 'LiuJianMaoCao-Regular.woff2' },
+  { family: 'Long Cang', weight: 400, file: 'LongCang-Regular.woff2' },
+  { family: 'ZCOOL XiaoWei', weight: 400, file: 'ZCOOLXiaoWei-Regular.woff2' },
+  { family: 'ZCOOL QingKe HuangYou', weight: 400, file: 'ZCOOLQingKeHuangYou-Regular.woff2' },
+  { family: 'Noto Sans SC', weight: 400, file: 'NotoSansSC-400.woff2' },
+  { family: 'Noto Sans SC', weight: 500, file: 'NotoSansSC-500.woff2' },
+  { family: 'Noto Sans SC', weight: 700, file: 'NotoSansSC-700.woff2' },
+  { family: 'Noto Sans SC', weight: 900, file: 'NotoSansSC-900.woff2' },
+  { family: 'Noto Serif SC', weight: 700, file: 'NotoSerifSC-700.woff2' },
+  { family: 'Noto Serif SC', weight: 900, file: 'NotoSerifSC-900.woff2' },
+]
+
+const FONTS_LOAD_TIMEOUT_MS = 8000
+
+function fontUrl(file: string): string {
+  const base = import.meta.env.BASE_URL || '/'
+  // Ensure single slash join for both "./" and "/awesome-signature-tools/"
+  const prefix = base.endsWith('/') ? base : `${base}/`
+  return `${prefix}fonts/${file}`
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
@@ -47,49 +54,53 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   })
 }
 
-async function waitForFaces(family: string, weights?: string): Promise<void> {
-  const face = weights ? `700 48px "${family}"` : `400 48px "${family}"`
+async function loadFontFile(entry: FontFile): Promise<void> {
+  const key = `${entry.family}|${entry.weight}`
+  if (loaded.has(key)) return
+  if (failed.has(key)) throw new Error(`Font previously failed: ${entry.family} ${entry.weight}`)
+
+  const url = fontUrl(entry.file)
+  const face = new FontFace(entry.family, `url(${JSON.stringify(url)}) format("woff2")`, {
+    weight: String(entry.weight),
+    style: 'normal',
+    display: 'swap',
+  })
+
   try {
-    await withTimeout(document.fonts.load(face), FONTS_LOAD_TIMEOUT_MS)
-    if (weights) {
-      for (const w of weights.split(';')) {
-        await withTimeout(document.fonts.load(`${w} 48px "${family}"`), FONTS_LOAD_TIMEOUT_MS).catch(
-          () => undefined,
-        )
-      }
-    }
-  } catch {
-    // Stylesheet loaded but fonts.load timed out / failed — best-effort; do not fail the family
+    await withTimeout(face.load(), FONTS_LOAD_TIMEOUT_MS)
+    document.fonts.add(face)
+    loaded.add(key)
+  } catch (e) {
+    failed.add(key)
+    throw e instanceof Error ? e : new Error(String(e))
   }
 }
 
+function filesNeededForFamily(family: string, weights?: string): FontFile[] {
+  const wanted = weights
+    ? new Set(weights.split(';').map((w) => Number(w)))
+    : null
+
+  const matches = FONT_FILES.filter((f) => {
+    if (f.family !== family) return false
+    if (!wanted) return f.weight === 400 || FONT_FILES.filter((x) => x.family === family).length === 1
+    return wanted.has(f.weight)
+  })
+
+  // Display families: single Regular covers all
+  if (matches.length === 0) {
+    return FONT_FILES.filter((f) => f.family === family)
+  }
+  return matches
+}
+
 async function loadFamily(family: string, weights?: string): Promise<void> {
-  const key = `${family}|${weights ?? ''}`
-  if (loaded.has(key)) return
-  if (failed.has(key)) throw new Error(`Font previously failed: ${family}`)
-
-  let stylesheetOk = false
-  let lastError: unknown
-
-  for (const host of FONT_CSS_HOSTS) {
-    const href = buildCssUrl(family, weights, host)
-    try {
-      await injectLink(href)
-      stylesheetOk = true
-      break
-    } catch (e) {
-      lastError = e
-    }
+  const files = filesNeededForFamily(family, weights)
+  if (files.length === 0) {
+    throw new Error(`No local font files for ${family}`)
   }
-
-  if (!stylesheetOk) {
-    throw lastError instanceof Error ? lastError : new Error(`All font hosts failed for ${family}`)
-  }
-
-  // Wait for FontFace; timeout still counts as best-effort success
-  await waitForFaces(family, weights)
-
-  loaded.add(key)
+  // Load all weight files for this family; one failure fails the family
+  await Promise.all(files.map((f) => loadFontFile(f)))
 }
 
 export async function loadAllFonts(
@@ -100,7 +111,6 @@ export async function loadAllFonts(
     if (!unique.has(s.googleFamily)) {
       unique.set(s.googleFamily, s.weights)
     } else if (s.weights) {
-      // merge weights
       const prev = unique.get(s.googleFamily)
       if (prev && !prev.includes(s.weights)) {
         unique.set(s.googleFamily, `${prev};${s.weights}`)
@@ -110,8 +120,12 @@ export async function loadAllFonts(
     }
   }
 
-  // Always load Noto Sans SC for UI
-  unique.set('Noto Sans SC', '400;500;700')
+  // Always load Noto Sans SC for UI (400/500/700)
+  const uiPrev = unique.get('Noto Sans SC')
+  unique.set(
+    'Noto Sans SC',
+    uiPrev ? Array.from(new Set([...uiPrev.split(';'), '400', '500', '700'])).join(';') : '400;500;700',
+  )
 
   const entries = [...unique.entries()]
   const ok: string[] = []
@@ -124,7 +138,6 @@ export async function loadAllFonts(
         await loadFamily(family, weights)
         ok.push(family)
       } catch {
-        failed.add(`${family}|${weights ?? ''}`)
         bad.push(family)
       } finally {
         done += 1
@@ -137,5 +150,5 @@ export async function loadAllFonts(
 }
 
 export function isFontReady(family: string): boolean {
-  return loaded.has(`${family}|`) || [...loaded].some((k) => k.startsWith(`${family}|`))
+  return [...loaded].some((k) => k.startsWith(`${family}|`))
 }

@@ -39,7 +39,7 @@ GitHub Pages is often unreachable from mainland China. This repo also publishes 
 - Mirrors: https://fastly.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html · https://gcore.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
 - **International / GitHub Pages**: https://dongzhongcen.github.io/awesome-signature-tools/
 
-Font stylesheets try China-friendly mirrors first (`fonts.loli.net` → `fonts.font.im`), then `fonts.googleapis.com`. Your name and signature stay local in the browser and are never uploaded.
+**Fonts are self-hosted** under `public/fonts/` (OFL woff2) and loaded same-origin — **no** Google Fonts or third-party font CDN. Your name and signature stay local in the browser and are never uploaded.
 
 ## Overview
 
@@ -90,11 +90,11 @@ Transparent · White · Xuan paper texture · Light gray paper · Red seal circl
 - Vite + React + TypeScript
 - Tailwind CSS
 - HTML Canvas (fully client-side)
-- GitHub Actions → GitHub Pages
+- GitHub Actions → GitHub Pages + `cdn` branch (jsDelivr)
 
 ## Fonts & licenses
 
-This repo does **not** ship font binaries. The browser loads these OFL families in order from `fonts.loli.net` → `fonts.font.im` → `fonts.googleapis.com`:
+This repo **self-hosts** chinese-simplified OFL woff2 subsets under `public/fonts/` (FontFace, same-origin — no external font requests):
 
 Ma Shan Zheng · Zhi Mang Xing · Liu Jian Mao Cao · Long Cang · ZCOOL XiaoWei · ZCOOL QingKe HuangYou · Noto Serif SC · Noto Sans SC
 

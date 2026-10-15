@@ -1,25 +1,33 @@
 Font notices for awesome-signature-tools / 在线免费生成电子签名
 ================================================================
 
-This project does NOT embed or redistribute font binary files.
-At runtime, the browser loads webfont CSS/files from Google Fonts
-(fonts.googleapis.com / fonts.gstatic.com), with fonts.loli.net as
-a fallback mirror for the same open families.
+This project **self-hosts** OFL font binaries (woff2) under `public/fonts/`.
+They are loaded at runtime via the FontFace API from the same origin
+(relative to the Vite `base` path). No Google Fonts / fonts.loli.net /
+fonts.font.im (or other third-party) stylesheet is fetched in the browser.
 
-All listed families are available on Google Fonts under the
-SIL Open Font License (OFL), Version 1.1 (or compatible open terms
-as published on Google Fonts for that family).
+Binaries are **SIL Open Font License (OFL) 1.1** chinese-simplified subsets
+packaged by Fontsource from the official Google Fonts OFL sources.
 
-Families used
--------------
-- Ma Shan Zheng          — OFL 1.1
-- Zhi Mang Xing          — OFL 1.1
-- Liu Jian Mao Cao       — OFL 1.1
-- Long Cang              — OFL 1.1
-- ZCOOL XiaoWei          — OFL 1.1
-- ZCOOL QingKe HuangYou  — OFL 1.1
-- Noto Serif SC          — OFL 1.1
-- Noto Sans SC           — OFL 1.1
+Families, files, and upstream
+-----------------------------
+| Family                 | Files shipped                                      | Upstream (google/fonts) |
+|------------------------|----------------------------------------------------|-------------------------|
+| Ma Shan Zheng          | MaShanZheng-Regular.woff2                          | https://github.com/google/fonts/tree/main/ofl/mashanzheng |
+| Zhi Mang Xing          | ZhiMangXing-Regular.woff2                          | https://github.com/google/fonts/tree/main/ofl/zhimangxing |
+| Liu Jian Mao Cao       | LiuJianMaoCao-Regular.woff2                        | https://github.com/google/fonts/tree/main/ofl/liujianmaocao |
+| Long Cang              | LongCang-Regular.woff2                             | https://github.com/google/fonts/tree/main/ofl/longcang |
+| ZCOOL XiaoWei          | ZCOOLXiaoWei-Regular.woff2                         | https://github.com/google/fonts/tree/main/ofl/zcoolxiaowei |
+| ZCOOL QingKe HuangYou  | ZCOOLQingKeHuangYou-Regular.woff2                  | https://github.com/google/fonts/tree/main/ofl/zcoolqingkehuangyou |
+| Noto Sans SC           | NotoSansSC-{400,500,700,900}.woff2                 | https://github.com/google/fonts/tree/main/ofl/notosanssc |
+| Noto Serif SC          | NotoSerifSC-{700,900}.woff2                        | https://github.com/google/fonts/tree/main/ofl/notoserifsc |
+
+Versions / packaging
+--------------------
+- Subset flavor: Fontsource `chinese-simplified` woff2 (covers common
+  Simplified Chinese glyphs used for names/UI; rare characters may fall back).
+- Refresh binaries: `node scripts/fetch-fonts.mjs`
+- Per-family OFL text copies: `fonts/licenses/OFL-*.txt`
 
 Additional visual styles (立体字 / 刀锋体 / 创意签 / 描边签 /
 印章红 / 霓虹签 / 网红签 etc.) are produced by Canvas drawing

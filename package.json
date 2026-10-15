@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "build:cdn": "tsc -b && VITE_BASE=./ vite build"
+    "build:cdn": "tsc -b && VITE_BASE=./ vite build",
+    "fonts:fetch": "node scripts/fetch-fonts.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",

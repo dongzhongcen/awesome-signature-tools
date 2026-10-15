@@ -39,7 +39,7 @@ GitHub Pages 在中国大陆网络下经常无法打开。本仓库另发布**�
 - 镜像（任选）：https://fastly.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html · https://gcore.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
 - **国际 / GitHub Pages**：https://dongzhongcen.github.io/awesome-signature-tools/
 
-字体样式表会优先从国内友好镜像（`fonts.loli.net` → `fonts.font.im`）加载，最后才回退到 `fonts.googleapis.com`。姓名与签名图仍只在浏览器本地渲染，不会上传。
+**字体已自托管**于仓库 `public/fonts/`（OFL woff2），随站点同源加载，**不依赖** Google Fonts 或第三方字体 CDN。姓名与签名图仍只在浏览器本地渲染，不会上传。
 
 ## 简介
 
@@ -90,11 +90,11 @@ GitHub Pages 在中国大陆网络下经常无法打开。本仓库另发布**�
 - Vite + React + TypeScript
 - Tailwind CSS
 - HTML Canvas（纯客户端绘制）
-- GitHub Actions → GitHub Pages
+- GitHub Actions → GitHub Pages + `cdn` 分支（jsDelivr）
 
 ## 字体与许可
 
-本仓库**不打包**字体二进制文件。运行时由浏览器按顺序从 `fonts.loli.net` → `fonts.font.im` → `fonts.googleapis.com` 加载以下 OFL 字体：
+本仓库在 `public/fonts/` **自托管**以下 OFL 字体的简体子集 woff2（同源 FontFace 加载，无外部字体请求）：
 
 Ma Shan Zheng · Zhi Mang Xing · Liu Jian Mao Cao · Long Cang · ZCOOL XiaoWei · ZCOOL QingKe HuangYou · Noto Serif SC · Noto Sans SC
 
