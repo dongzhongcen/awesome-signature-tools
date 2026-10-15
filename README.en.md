@@ -43,7 +43,15 @@ GitHub Pages is often unreachable from mainland China. This repo also publishes 
 
 - **Lazy-load**: first paint loads only the default brush face + UI Noto Sans SC; other styles load on chip select or batch generate.
 - **Name subset**: display fonts are subset to ~2.2k common name CJK + Latin/punct.
-- **Offline**: download the Release zip `offline-signature-generator.zip`, unzip, and double-click `index.html` (`file://`). See `OFFLINE.txt` inside.
+### Offline use
+
+When the CDN or GitHub Pages is blocked, use the offline zip (no Node required):
+
+1. Open the [v1.1.0-fonts Release](https://github.com/dongzhongcen/awesome-signature-tools/releases/tag/v1.1.0-fonts) and download `offline-signature-generator.zip`
+2. Unzip it anywhere
+3. **Double-click `index.html`** to open it in a browser
+
+Fonts live under `./fonts/` and load locally. If the browser blocks local scripts, run `python3 -m http.server` in the unzipped folder and open the local URL it prints. See `OFFLINE.txt` in the zip for details.
 
 ## Overview
 
