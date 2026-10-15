@@ -1,0 +1,36 @@
+Font notices for awesome-signature-tools / 在线免费生成电子签名
+================================================================
+
+This project does NOT embed or redistribute font binary files.
+At runtime, the browser loads webfont CSS/files from Google Fonts
+(fonts.googleapis.com / fonts.gstatic.com), with fonts.loli.net as
+a fallback mirror for the same open families.
+
+All listed families are available on Google Fonts under the
+SIL Open Font License (OFL), Version 1.1 (or compatible open terms
+as published on Google Fonts for that family).
+
+Families used
+-------------
+- Ma Shan Zheng          — OFL 1.1
+- Zhi Mang Xing          — OFL 1.1
+- Liu Jian Mao Cao       — OFL 1.1
+- Long Cang              — OFL 1.1
+- ZCOOL XiaoWei          — OFL 1.1
+- ZCOOL QingKe HuangYou  — OFL 1.1
+- Noto Serif SC          — OFL 1.1
+- Noto Sans SC           — OFL 1.1
+
+Additional visual styles (立体字 / 刀锋体 / 创意签 / 描边签 /
+印章红 / 霓虹签 / 网红签 etc.) are produced by Canvas drawing
+effects on top of the open fonts above — no proprietary commercial
+signature fonts are downloaded, mirrored, or embedded.
+
+OFL summary (non-official)
+--------------------------
+You may use, study, modify, and redistribute the fonts (including
+commercially), but you may not sell the font alone, and modified
+versions must not use the Reserved Font Name without permission.
+Full license text: https://openfontlicense.org/open-font-license-official-text/
+
+Project code license: MIT (see /LICENSE)
