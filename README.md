@@ -44,9 +44,15 @@ GitHub Pages 在中国大陆网络下经常无法打开。本仓库另发布**�
 - **按需加载**：首次仅加载默认「毛笔签」+ 界面字体（Noto Sans SC）；切换风格芯片或「一键生成多款」时再拉取对应字体。
 - **常用字子集**：展示字体已用姓名常用字（约 2.2k 汉字 + 拉丁/标点）子集，显著减小体积；极生僻字会提示「当前字体子集未包含该字」。
 
-### 离线打开（草案）
+### 离线打开
 
-若 jsDelivr 连接失败，可从 Releases 下载 `offline-签名生成.zip`，解压后**双击 `index.html`**（`file://`）即可离线使用；字体在 `./fonts/`。备选：`python3 -m http.server` 后本地访问。详见包内 `OFFLINE.txt`。
+CDN / GitHub Pages 打不开时，用离线包最稳（不需要会 Node）：
+
+1. 打开 [v1.1.0-fonts Release](https://github.com/dongzhongcen/awesome-signature-tools/releases/tag/v1.1.0-fonts)，下载 `offline-签名生成.zip`（若列表里显示成 `offline-.zip`，下载的是同一个包）
+2. 解压到任意文件夹
+3. **双击 `index.html`** 用浏览器打开即可
+
+字体在 `./fonts/`，随包本地加载。若浏览器拦截了本地脚本，可在解压目录执行 `python3 -m http.server`，再用浏览器打开提示的本地地址。更细说明见包内 `OFFLINE.txt`。
 
 ## 简介
 
