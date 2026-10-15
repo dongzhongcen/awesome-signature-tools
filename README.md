@@ -8,10 +8,9 @@
 
 *多风格字体 · 宣纸/印章背景 · 签名头像 · 一键多款 · PNG 下载*
 
-[English](./README.en.md) · [国内访问](https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html) · [国际 / GitHub Pages](https://dongzhongcen.github.io/awesome-signature-tools/)
+[English](./README.en.md) · [国内访问](#国内访问) · [国际 / GitHub Pages](https://dongzhongcen.github.io/awesome-signature-tools/)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![国内 CDN](https://img.shields.io/badge/China-jsDelivr-orange)](https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://dongzhongcen.github.io/awesome-signature-tools/)
 [![Vite](https://img.shields.io/badge/Vite-5+-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -33,10 +32,8 @@
 
 ## 国内访问
 
-GitHub Pages 在中国大陆网络下经常无法打开。本仓库另发布**相对路径**构建到 `cdn` 分支，可通过 jsDelivr 访问：
+GitHub Pages 在中国大陆网络下经常无法打开。jsDelivr 等 CDN 会把 `index.html` 以 `text/plain` 返回，浏览器只能看到源码、无法当网站用。**在中国大陆使用本站，推荐下载离线包本地打开**（见下方「离线打开」）。仓库仍会发布相对路径构建到 `cdn` 分支，供离线包打包使用。
 
-- **国内主入口（jsDelivr）**：https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
-- 镜像（任选）：https://fastly.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html · https://gcore.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
 - **国际 / GitHub Pages**：https://dongzhongcen.github.io/awesome-signature-tools/
 
 **字体已自托管**于仓库 `public/fonts/`（OFL woff2），随站点同源加载，**不依赖** Google Fonts 或第三方字体 CDN。姓名与签名图仍只在浏览器本地渲染，不会上传。
@@ -46,7 +43,7 @@ GitHub Pages 在中国大陆网络下经常无法打开。本仓库另发布**�
 
 ### 离线打开
 
-CDN / GitHub Pages 打不开时，用离线包最稳（不需要会 Node）：
+**推荐方式**：下载离线包在本地使用（不需要会 Node）：
 
 1. 下载离线包 `offline-signature-generator.zip`（任选其一）：
    - [国内代理下载（推荐）](https://ghfast.top/https://github.com/dongzhongcen/awesome-signature-tools/releases/download/v1.1.0-fonts/offline-signature-generator.zip)
@@ -106,7 +103,7 @@ CDN / GitHub Pages 打不开时，用离线包最稳（不需要会 Node）：
 - Vite + React + TypeScript
 - Tailwind CSS
 - HTML Canvas（纯客户端绘制）
-- GitHub Actions → GitHub Pages + `cdn` 分支（jsDelivr）
+- GitHub Actions → GitHub Pages + `cdn` 分支（离线包）
 
 ## 字体与许可
 
@@ -127,21 +124,21 @@ npm run dev
 
 ```bash
 npm run build          # GitHub Pages（base: /awesome-signature-tools/）
-npm run build:cdn      # 便携 CDN（base: ./ ，供 jsDelivr）
+npm run build:cdn      # 相对路径构建（base: ./ ，供 cdn 分支 / 离线包）
 npm run preview
 ```
 
-默认 `base` 为 `/awesome-signature-tools/`；设置 `VITE_BASE=./`（或运行 `build:cdn`）可生成相对路径资源，便于 jsDelivr 等 CDN 托管。
+默认 `base` 为 `/awesome-signature-tools/`；设置 `VITE_BASE=./`（或运行 `build:cdn`）可生成相对路径资源，供 `cdn` 分支与离线包使用。
 
 ## 部署
 
 推送到 `main` 分支后，`.github/workflows/deploy.yml` 会：
 
 1. 构建并发布到 **GitHub Pages**
-2. 以相对路径再构建一次，强制更新 **`cdn` 分支**（供 jsDelivr）
+2. 以相对路径再构建一次，强制更新 **`cdn` 分支**（供离线包构建）
 
-- 国内：https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
 - 国际：https://dongzhongcen.github.io/awesome-signature-tools/
+- 国内：见上方「国内访问」离线包
 
 ## 许可
 

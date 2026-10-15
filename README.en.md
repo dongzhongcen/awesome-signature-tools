@@ -8,10 +8,9 @@
 
 *Multi-style fonts · Paper / seal backgrounds · Avatar crop · Batch styles · PNG download*
 
-[简体中文](./README.md) · [Mainland China](https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html) · [International / GitHub Pages](https://dongzhongcen.github.io/awesome-signature-tools/)
+[简体中文](./README.md) · [Mainland China](#mainland-china-access) · [International / GitHub Pages](https://dongzhongcen.github.io/awesome-signature-tools/)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![China CDN](https://img.shields.io/badge/China-jsDelivr-orange)](https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://dongzhongcen.github.io/awesome-signature-tools/)
 [![Vite](https://img.shields.io/badge/Vite-5+-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -33,19 +32,18 @@ Your name and signature image are rendered **locally in the browser** via Canvas
 
 ## Mainland China access
 
-GitHub Pages is often unreachable from mainland China. This repo also publishes a **relative-path** build to the `cdn` branch for jsDelivr:
+GitHub Pages is often unreachable from mainland China. jsDelivr and similar CDNs serve `index.html` as `text/plain`, so browsers show raw source instead of running the site. **The recommended way to use this site in mainland China is the offline zip** (see “Offline use” below). The repo still publishes a relative-path build to the `cdn` branch for building that offline pack.
 
-- **Primary China URL (jsDelivr)**: https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
-- Mirrors: https://fastly.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html · https://gcore.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
 - **International / GitHub Pages**: https://dongzhongcen.github.io/awesome-signature-tools/
 
 **Fonts are self-hosted** under `public/fonts/` (OFL woff2) and loaded same-origin — **no** Google Fonts or third-party font CDN. Your name and signature stay local in the browser and are never uploaded.
 
 - **Lazy-load**: first paint loads only the default brush face + UI Noto Sans SC; other styles load on chip select or batch generate.
 - **Name subset**: display fonts are subset to ~2.2k common name CJK + Latin/punct.
+
 ### Offline use
 
-When the CDN or GitHub Pages is blocked, use the offline zip (no Node required):
+**Recommended**: download the offline zip and open it locally (no Node required):
 
 1. Download `offline-signature-generator.zip` (pick one):
    - [China proxy (recommended)](https://ghfast.top/https://github.com/dongzhongcen/awesome-signature-tools/releases/download/v1.1.0-fonts/offline-signature-generator.zip)
@@ -105,7 +103,7 @@ Transparent · White · Xuan paper texture · Light gray paper · Red seal circl
 - Vite + React + TypeScript
 - Tailwind CSS
 - HTML Canvas (fully client-side)
-- GitHub Actions → GitHub Pages + `cdn` branch (jsDelivr)
+- GitHub Actions → GitHub Pages + `cdn` branch (offline pack)
 
 ## Fonts & licenses
 
@@ -126,21 +124,21 @@ Build:
 
 ```bash
 npm run build          # GitHub Pages (base: /awesome-signature-tools/)
-npm run build:cdn      # Portable CDN (base: ./ for jsDelivr)
+npm run build:cdn      # Relative-path build (base: ./ for cdn branch / offline pack)
 npm run preview
 ```
 
-Default `base` is `/awesome-signature-tools/`; set `VITE_BASE=./` (or run `build:cdn`) for relative asset paths suitable for jsDelivr.
+Default `base` is `/awesome-signature-tools/`; set `VITE_BASE=./` (or run `build:cdn`) for relative asset paths used by the `cdn` branch and offline pack.
 
 ## Deploy
 
 Pushing to `main` runs `.github/workflows/deploy.yml`, which:
 
 1. Builds and deploys to **GitHub Pages**
-2. Rebuilds with relative paths and force-updates the **`cdn` branch** (for jsDelivr)
+2. Rebuilds with relative paths and force-updates the **`cdn` branch** (for the offline pack)
 
-- China: https://cdn.jsdelivr.net/gh/dongzhongcen/awesome-signature-tools@cdn/index.html
 - International: https://dongzhongcen.github.io/awesome-signature-tools/
+- Mainland China: see “Mainland China access” / offline zip above
 
 ## License
 
