@@ -46,7 +46,7 @@ GitHub Pages 在中国大陆网络下经常无法打开。本仓库另发布**�
 
 ### 离线打开（草案）
 
-若 jsDelivr 连接失败，可从 Releases 下载 `offline-签名生成.zip`，解压后**双击 `index.html`**（`file://`）即可离线使用；字体在 `./fonts/`。备选：`python3 -m http.server` 后本地访问。详见包内 `OFFLINE.txt`。
+若 jsDelivr 连接失败，可从 Releases 下载 `offline-signature-generator.zip`，解压后**双击 `index.html`**（`file://`）即可离线使用；字体在 `./fonts/`。备选：`python3 -m http.server` 后本地访问。详见包内 `OFFLINE.txt`。
 
 ## 简介
 

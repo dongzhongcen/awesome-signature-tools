@@ -43,7 +43,7 @@ GitHub Pages is often unreachable from mainland China. This repo also publishes 
 
 - **Lazy-load**: first paint loads only the default brush face + UI Noto Sans SC; other styles load on chip select or batch generate.
 - **Name subset**: display fonts are subset to ~2.2k common name CJK + Latin/punct.
-- **Offline**: download the Release zip `offline-签名生成.zip`, unzip, and double-click `index.html` (`file://`). See `OFFLINE.txt` inside.
+- **Offline**: download the Release zip `offline-signature-generator.zip`, unzip, and double-click `index.html` (`file://`). See `OFFLINE.txt` inside.
 
 ## Overview
 
